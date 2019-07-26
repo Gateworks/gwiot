@@ -39,8 +39,6 @@ CFLAGS = \
     "-I$(COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR)/kernel/tirtos/packages/gnu/targets/arm/libs/install-native/arm-none-eabi/include" \
     "-I$(GCC_ARMCOMPILER)/arm-none-eabi/include"
 
-#CFLAGS += -DHIGH_PA
-
 LFLAGS = -Wl,-T,rfdemo.lds \
     "-Wl,-Map,$(NAME).map" \
     "-L$(COM_TI_SIMPLELINK_CC13X2_26X2_SDK_INSTALL_DIR)/source" \
