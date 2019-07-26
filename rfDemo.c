@@ -756,46 +756,40 @@ static uint8_t rfTaskStack[THREADSTACKSIZE];
 
 static void rfTaskFunction(UArg arg0, UArg arg1)
 {
-	char mode_rx = 1;
-	char highpa = 1;
-	int input;
-	int rz;
+	char mode_rx;
+	char highpa;
 	RF_Params rfParams;
 
 	/* set both LEDs off */
 	PIN_setOutputValue(pinHandle, Board_PIN_LEDGRN, 0);
 	PIN_setOutputValue(pinHandle, Board_PIN_LEDRED, 0);
 
-	printf("\r\n\r\nrfDemo:\r\nMode (T/r)?:");
-	rz = UART_read(uart, &input, 1);
-	printf("\r\n");
-	if (rz == 1) {
-		if (tolower(input) != 'r')
-			mode_rx = 0;
-		printf("high gain (Y/n):");
-		rz = UART_read(uart, &input, 1);
-		if (rz == 1 && tolower(input) == 'n')
-			highpa = 0;
-		printf("\r\n");
-	}
-	else
-	{
-		// BTN2 || DIO_26 low = TX (default RX)
-		// BTN1 || DIO_21 low = 14dBm (default 20dBm)
-		printf("BTN1:DIO%d=%d\r\n", Board_PIN_BTN1,
-			(int)PIN_getInputValue(Board_PIN_BTN1));
-		printf("BTN2:DIO%d=%d\r\n", Board_PIN_BTN2,
-			(int)PIN_getInputValue(Board_PIN_BTN2));
-		printf("DIO26:DIO%d=%d\r\n", IOID_26,
-			(int)PIN_getInputValue(IOID_26));
-		printf("DIO21:DIO%d=%d\r\n", IOID_21,
-			(int)PIN_getInputValue(IOID_21));
-		if (!PIN_getInputValue(Board_PIN_BTN2) ||
-		    !PIN_getInputValue(IOID_26))
-			mode_rx = 0;
+	printf("\r\n\r\nrfDemo:\r\n");
+
+	// BTN2 || DIO_26 low = TX (default RX)
+	// BTN1 || DIO_21 low = 14dBm (default 20dBm)
+	mode_rx = 1;
+	highpa = 1;
+	if (!PIN_getInputValue(Board_PIN_BTN2) || !PIN_getInputValue(IOID_26)) {
+		mode_rx = 0;
 		if (!PIN_getInputValue(Board_PIN_BTN1) ||
 		    !PIN_getInputValue(IOID_21))
 			highpa = 0;
+	} else {
+		int input;
+		int rz;
+
+		printf("Mode (T/r)?:");
+		rz = UART_read(uart, &input, 1);
+		printf("\r\n");
+		if (rz == 1 && (tolower(input) != 'r')) {
+			mode_rx = 0;
+			printf("high gain (Y/n):");
+			rz = UART_read(uart, &input, 1);
+			if (rz == 1 && tolower(input) == 'n')
+				highpa = 0;
+			printf("\r\n");
+		}
 	}
 
 	printf("modex_rx=%d highpa=%d\r\n", mode_rx, highpa);
